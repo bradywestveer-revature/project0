@@ -26,7 +26,7 @@ public class ClientDaoImplementation implements ClientDao {
 	}
 	
 	@Override
-	public Client getClient (Integer clientId) throws SQLException, NotFoundException {
+	public Client getClient (int clientId) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM clients WHERE id = ?;");
 			
@@ -60,7 +60,7 @@ public class ClientDaoImplementation implements ClientDao {
 	}
 	
 	@Override
-	public void updateClientName (Integer clientId, String clientName) throws SQLException, NotFoundException {
+	public void updateClientName (int clientId, String clientName) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("UPDATE clients SET name = ? WHERE id = ?;");
 			
@@ -76,7 +76,7 @@ public class ClientDaoImplementation implements ClientDao {
 	}
 	
 	@Override
-	public void deleteClient (Integer clientId) throws SQLException, NotFoundException {
+	public void deleteClient (int clientId) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("DELETE FROM clients WHERE id = ?;");
 			

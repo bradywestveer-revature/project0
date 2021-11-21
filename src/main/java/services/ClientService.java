@@ -8,17 +8,23 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ClientService {
-	private ClientDao clientDao;
+	private final ClientDao clientDao;
 	
 	public ClientService (ClientDao clientDao) {
 		this.clientDao = clientDao;
 	}
 	
-	public List <Client> getClients () throws SQLException {
-		return clientDao.getClients ();
+	public List <Client> getClients () throws SQLException, NotFoundException {
+		List <Client> clients = clientDao.getClients ();
+		
+		if (clients.size () == 0) {
+			throw new NotFoundException ("Error! No clients found");
+		}
+		
+		return clients;
 	}
 	
-	public Client getClient (Integer clientId) throws SQLException, NotFoundException {
+	public Client getClient (int clientId) throws SQLException, NotFoundException {
 		return clientDao.getClient (clientId);
 	}
 	
@@ -26,11 +32,11 @@ public class ClientService {
 		clientDao.createClient (clientName);
 	}
 	
-	public void updateClientName (Integer clientId, String clientName) throws SQLException, NotFoundException {
+	public void updateClientName (int clientId, String clientName) throws SQLException, NotFoundException {
 		clientDao.updateClientName (clientId, clientName);
 	}
 	
-	public void deleteClient (Integer clientId) throws SQLException, NotFoundException {
+	public void deleteClient (int clientId) throws SQLException, NotFoundException {
 		clientDao.deleteClient (clientId);
 	}
 }

@@ -2,7 +2,6 @@ package dao;
 
 import exceptions.NotFoundException;
 import models.Account;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class AccountDaoImplementation implements AccountDao {
 	}
 	
 	@Override
-	public Account getAccount (Integer accountId) throws SQLException, NotFoundException {
+	public Account getAccount (int accountId) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM accounts WHERE id = ?;");
 			
@@ -52,7 +51,7 @@ public class AccountDaoImplementation implements AccountDao {
 	}
 	
 	@Override
-	public Integer getAccountClientId (int accountId) throws SQLException, NotFoundException {
+	public int getAccountClientId (int accountId) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM accounts WHERE id = ?;");
 			
@@ -75,7 +74,7 @@ public class AccountDaoImplementation implements AccountDao {
 	}
 	
 	@Override
-	public Float getAccountBalance (Integer accountId) throws SQLException, NotFoundException {
+	public float getAccountBalance (int accountId) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM accounts WHERE id = ?;");
 			
@@ -98,7 +97,7 @@ public class AccountDaoImplementation implements AccountDao {
 	}
 	
 	@Override
-	public void createAccount (Integer clientId, String accountName) throws SQLException, NotFoundException {
+	public void createAccount (int clientId, String accountName) throws SQLException, NotFoundException {
 		//throws NotFoundException if client doesn't exist
 		clientDao.getClient (clientId);
 		
@@ -113,7 +112,7 @@ public class AccountDaoImplementation implements AccountDao {
 	}
 	
 	@Override
-	public void updateAccountName (Integer accountId, String accountName) throws SQLException, NotFoundException {
+	public void updateAccountName (int accountId, String accountName) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("UPDATE accounts SET name = ? WHERE id = ?;");
 			
@@ -128,7 +127,7 @@ public class AccountDaoImplementation implements AccountDao {
 	}
 	
 	@Override
-	public void updateAccountBalance (Integer accountId, Float balance) throws SQLException, NotFoundException {
+	public void updateAccountBalance (int accountId, float balance) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("UPDATE accounts SET balance = ? WHERE id = ?;");
 			
@@ -143,7 +142,7 @@ public class AccountDaoImplementation implements AccountDao {
 	}
 	
 	@Override
-	public void deleteAccount (Integer accountId) throws SQLException, NotFoundException {
+	public void deleteAccount (int accountId) throws SQLException, NotFoundException {
 		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
 			PreparedStatement statement = connection.prepareStatement ("DELETE FROM accounts WHERE id = ?;");
 			

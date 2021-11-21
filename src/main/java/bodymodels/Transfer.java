@@ -1,22 +1,20 @@
 package bodymodels;
 
 public class Transfer {
-	private float amount;
+	private Float amount;
 	
 	//used by ObjectMapper
-	public Transfer () {
-		this.amount = -1F;
-	}
+	public Transfer () {}
 	
-	public Transfer (float amount) {
+	public Transfer (Float amount) {
 		this.amount = amount;
 	}
 	
-	public float getAmount () {
+	public Float getAmount () {
 		return amount;
 	}
 	
-	public void setAmount (float amount) {
+	public void setAmount (Float amount) {
 		this.amount = amount;
 	}
 }

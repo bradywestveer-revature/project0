@@ -1,33 +1,30 @@
 package bodymodels;
 
 public class Transaction {
-	private float deposit;
-	private float withdraw;
+	private Float deposit;
+	private Float withdraw;
 	
 	//used by ObjectMapper
-	public Transaction () {
-		this.deposit = -1F;
-		this.withdraw = -1F;
-	}
+	public Transaction () {}
 	
-	public Transaction (float deposit, float withdraw) {
+	public Transaction (Float deposit, Float withdraw) {
 		this.deposit = deposit;
 		this.withdraw = withdraw;
 	}
 	
-	public float getDeposit () {
+	public Float getDeposit () {
 		return deposit;
 	}
 	
-	public void setDeposit (float deposit) {
+	public void setDeposit (Float deposit) {
 		this.deposit = deposit;
 	}
 	
-	public float getWithdraw () {
+	public Float getWithdraw () {
 		return withdraw;
 	}
 	
-	public void setWithdraw (float withdraw) {
+	public void setWithdraw (Float withdraw) {
 		this.withdraw = withdraw;
 	}
 }

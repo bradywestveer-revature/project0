@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface AccountDao {
 	List <Account> getAccounts () throws SQLException;
-	Account getAccount (Integer accountId) throws SQLException, NotFoundException;
-	Integer getAccountClientId (int accountId) throws SQLException, NotFoundException;
-	Float getAccountBalance (Integer accountId) throws SQLException, NotFoundException;
-	void createAccount (Integer clientId, String accountName) throws SQLException, NotFoundException;
-	void updateAccountName (Integer accountId, String accountName) throws SQLException, NotFoundException;
-	void updateAccountBalance (Integer accountId, Float balance) throws SQLException, NotFoundException;
-	void deleteAccount (Integer accountId) throws SQLException, NotFoundException;
+	Account getAccount (int accountId) throws SQLException, NotFoundException;
+	int getAccountClientId (int accountId) throws SQLException, NotFoundException;
+	float getAccountBalance (int accountId) throws SQLException, NotFoundException;
+	void createAccount (int clientId, String accountName) throws SQLException, NotFoundException;
+	void updateAccountName (int accountId, String accountName) throws SQLException, NotFoundException;
+	void updateAccountBalance (int accountId, float balance) throws SQLException, NotFoundException;
+	void deleteAccount (int accountId) throws SQLException, NotFoundException;
 }

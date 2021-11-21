@@ -1,15 +1,12 @@
 package controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.ClientDaoImplementation;
 import exceptions.InvalidBodyException;
-import exceptions.NotFoundException;
+import frontcontroller.Dispatcher;
 import io.javalin.http.Context;
 import models.Client;
 import services.ClientService;
-
-import java.sql.SQLException;
 
 public class ClientController {
 	private static final ClientService clientService = new ClientService (new ClientDaoImplementation ());
@@ -22,18 +19,8 @@ public class ClientController {
 			context.result (new ObjectMapper ().writeValueAsString (clientService.getClients ()));
 		}
 		
-		catch (JsonProcessingException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! JSON processing error");
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -49,32 +36,8 @@ public class ClientController {
 			context.result (new ObjectMapper ().writeValueAsString (client));
 		}
 		
-		catch (NumberFormatException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! Invalid client id");
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (JsonProcessingException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! JSON processing error");
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -82,8 +45,8 @@ public class ClientController {
 		try {
 			String clientName = context.bodyAsClass (Client.class).getName ();
 			
-			if (clientName.equals ("")) {
-				throw new InvalidBodyException ("Error! Invalid body!");
+			if (clientName == null) {
+				throw new InvalidBodyException ();
 			}
 			
 			clientService.createClient (clientName);
@@ -94,26 +57,8 @@ public class ClientController {
 			context.result ("Created client with name: " + clientName);
 		}
 		
-		catch (InvalidBodyException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		//catching specific exception doesn't work for context.bodyAsClass for some reason
 		catch (Exception exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! Invalid body");
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -123,8 +68,8 @@ public class ClientController {
 			
 			String clientName = context.bodyAsClass (Client.class).getName ();
 			
-			if (clientName.equals ("")) {
-				throw new InvalidBodyException ("Error! Invalid body!");
+			if (clientName == null) {
+				throw new InvalidBodyException ();
 			}
 			
 			clientService.updateClientName (clientId, clientName);
@@ -132,43 +77,11 @@ public class ClientController {
 			context.status (200);
 			context.contentType ("text/plain");
 			
-			context.result ("Updated client with id: " + clientId + "'s name to: " + clientName);
+			context.result ("Updated client with client id: " + clientId + "'s name to: " + clientName);
 		}
 		
-		catch (NumberFormatException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! Invalid client id");
-		}
-		
-		catch (InvalidBodyException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		//catching specific exception doesn't work for context.bodyAsClass for some reason
 		catch (Exception exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! Invalid body");
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -181,28 +94,11 @@ public class ClientController {
 			context.status (205);
 			context.contentType ("text/plain");
 			
-			context.result ("Deleted client with id: " + clientId);
+			context.result ("Deleted client with client id: " + clientId);
 		}
 		
-		catch (NumberFormatException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! Invalid client id");
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 }

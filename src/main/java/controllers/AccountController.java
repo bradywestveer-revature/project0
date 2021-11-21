@@ -2,49 +2,38 @@ package controllers;
 
 import bodymodels.Transaction;
 import bodymodels.Transfer;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dao.AccountDaoImplementation;
-import exceptions.InsufficientBalanceException;
 import exceptions.InvalidBodyException;
-import exceptions.NotFoundException;
-import exceptions.UnauthorizedClientException;
+import frontcontroller.Dispatcher;
 import io.javalin.http.Context;
 import models.Account;
 import services.AccountService;
 
-import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 public class AccountController {
 	private static final AccountService accountService = new AccountService (new AccountDaoImplementation ());
 	
 	public static void getAccounts (Context context) {
 		try {
+			String minimumBalance = context.queryParam ("amountGreaterThan");
+			String maximumBalance = context.queryParam ("amountLessThan");
+			
 			context.status (200);
 			context.contentType ("application/json");
 			
-			context.result (new ObjectMapper ().writeValueAsString (accountService.getAccounts (Integer.parseInt (context.pathParam ("clientId")))));
+			if (minimumBalance != null && maximumBalance != null) {
+				context.result (new ObjectMapper ().writeValueAsString (accountService.getAccountsInRange (Integer.parseInt (context.pathParam ("clientId")), Float.parseFloat (minimumBalance), Float.parseFloat (maximumBalance))));
+			}
+			
+			else {
+				context.result (new ObjectMapper ().writeValueAsString (accountService.getAccounts (Integer.parseInt (context.pathParam ("clientId")))));
+			}
 		}
 		
-		catch (NumberFormatException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! Invalid client id");
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (JsonProcessingException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! JSON processing error");
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -56,32 +45,8 @@ public class AccountController {
 			context.result (new ObjectMapper ().writeValueAsString (accountService.getAccount (Integer.parseInt (context.pathParam ("clientId")), Integer.parseInt (context.pathParam ("accountId")))));
 		}
 		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (UnauthorizedClientException exception) {
-			context.status (401);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (JsonProcessingException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! JSON processing error");
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -89,8 +54,8 @@ public class AccountController {
 		try {
 			String accountName = context.bodyAsClass (Account.class).getName ();
 			
-			if (accountName.equals ("")) {
-				throw new InvalidBodyException ("Error! Invalid body!");
+			if (accountName == null) {
+				throw new InvalidBodyException ();
 			}
 			
 			accountService.createAccount (Integer.parseInt (context.pathParam ("clientId")), accountName);
@@ -101,25 +66,8 @@ public class AccountController {
 			context.result ("Created account with name: " + accountName);
 		}
 		
-		catch (InvalidBodyException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -128,8 +76,8 @@ public class AccountController {
 			int accountId = Integer.parseInt (context.pathParam ("accountId"));
 			String accountName = context.bodyAsClass (Account.class).getName ();
 			
-			if (accountName.equals ("")) {
-				throw new InvalidBodyException ("Error! Invalid body!");
+			if (accountName == null) {
+				throw new InvalidBodyException ();
 			}
 			
 			accountService.updateAccountName (Integer.parseInt (context.pathParam ("clientId")), accountId, accountName);
@@ -140,32 +88,8 @@ public class AccountController {
 			context.result ("Updated account with account id: " + accountId + "'s name to: " + accountName);
 		}
 		
-		catch (InvalidBodyException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (UnauthorizedClientException exception) {
-			context.status (401);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -176,73 +100,34 @@ public class AccountController {
 			
 			Transaction transaction = context.bodyAsClass (Transaction.class);
 			
-			float deposit = transaction.getDeposit ();
-			float withdraw = transaction.getWithdraw ();
+			Float deposit = transaction.getDeposit ();
+			Float withdraw = transaction.getWithdraw ();
 			
-			if (deposit != -1F) {
+			if (deposit != null && deposit > 0) {
 				accountService.depositToAccount (clientId, accountId, deposit);
 				
 				context.status (200);
 				context.contentType ("text/plain");
 				
-				context.result ("Deposited $" + deposit + " to account with account id: " + accountId);
+				context.result ("Deposited $" + new DecimalFormat ("0.00").format (deposit) + " to account with account id: " + accountId);
 			}
 			
-			else if (withdraw != -1F) {
+			else if (withdraw != null && withdraw > 0) {
 				accountService.withdrawFromAccount (clientId, accountId, withdraw);
 				
 				context.status (200);
 				context.contentType ("text/plain");
 				
-				context.result ("Withdrew $" + withdraw + " from account with account id: " + accountId);
+				context.result ("Withdrew $" + new DecimalFormat ("0.00").format (withdraw) + " from account with account id: " + accountId);
 			}
 			
 			else {
-				throw new InvalidBodyException ("Error! Invalid body");
+				throw new InvalidBodyException ();
 			}
 		}
 		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (UnauthorizedClientException exception) {
-			context.status (401);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (InsufficientBalanceException exception) {
-			context.status (422);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (InvalidBodyException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		//catching specific exception doesn't work for context.bodyAsClass for some reason
 		catch (Exception exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-
-			context.result ("Error! Invalid body");
+			Dispatcher.handleException (exception, context);
 		}
 	}
 	
@@ -254,63 +139,42 @@ public class AccountController {
 			
 			Transfer transfer = context.bodyAsClass (Transfer.class);
 			
-			float amount = transfer.getAmount ();
+			Float amount = transfer.getAmount ();
 			
-			if (amount != -1F) {
+			if (amount != null && amount > 0F) {
 				accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, amount);
 				
 				context.status (200);
 				context.contentType ("text/plain");
 				
-				context.result ("Transferred $" + amount + " from account with account id: " + fromAccountId + " to account with account id: " + toAccountId);
+				context.result ("Transferred $" + new DecimalFormat ("0.00").format (amount) + " from account with account id: " + fromAccountId + " to account with account id: " + toAccountId);
 			}
 			
 			else {
-				throw new InvalidBodyException ("Error! Invalid body");
+				throw new InvalidBodyException ();
 			}
 		}
 		
-		catch (SQLException exception) {
-			context.status (500);
-			context.contentType ("text/plain");
-			
-			context.result ("Error! SQL error");
-		}
-		
-		catch (NotFoundException exception) {
-			context.status (404);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (UnauthorizedClientException exception) {
-			context.status (401);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (InsufficientBalanceException exception) {
-			context.status (422);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		catch (InvalidBodyException exception) {
-			context.status (400);
-			context.contentType ("text/plain");
-			
-			context.result (exception.getMessage ());
-		}
-		
-		//catching specific exception doesn't work for context.bodyAsClass for some reason
 		catch (Exception exception) {
-			context.status (400);
+			Dispatcher.handleException (exception, context);
+		}
+	}
+	
+	public static void deleteAccount (Context context) {
+		try {
+			int clientId = Integer.parseInt (context.pathParam ("clientId"));
+			int accountId = Integer.parseInt (context.pathParam ("accountId"));
+			
+			accountService.deleteAccount (clientId, accountId);
+			
+			context.status (205);
 			context.contentType ("text/plain");
 			
-			context.result ("Error! Invalid body");
+			context.result ("Deleted account with account id: " + accountId);
+		}
+		
+		catch (Exception exception) {
+			Dispatcher.handleException (exception, context);
 		}
 	}
 }
