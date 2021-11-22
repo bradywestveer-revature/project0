@@ -12,85 +12,90 @@ import exceptions.InvalidBodyException;
 import exceptions.NotFoundException;
 import exceptions.UnauthorizedClientException;
 import io.javalin.Javalin;
-import io.javalin.http.Context;
+import org.apache.log4j.Logger;
 import org.postgresql.util.PSQLException;
 
 import java.sql.SQLException;
 
+import static io.javalin.apibuilder.ApiBuilder.*;
+
 public class Dispatcher {
 	public Dispatcher (Javalin webServer) {
-		//clients
-		webServer.get ("/clients", ClientController::getClients);
-		webServer.get ("/clients/{clientId}", ClientController::getClient);
+		webServer.routes (() -> {
+			path ("clients", () -> {
+				get (ClientController::getClients);
+				post (ClientController::createClient);
+				
+				path ("{clientId}", () -> {
+					get (ClientController::getClient);
+					put (ClientController::updateClientName);
+					delete (ClientController::deleteClient);
+					
+					path ("accounts", () -> {
+						get (AccountController::getAccounts);
+						post (AccountController::createAccount);
+						
+						path ("{accountId}", () -> {
+							get (AccountController::getAccount);
+							put (AccountController::updateAccountName);
+							patch (AccountController::updateAccountBalance);
+							delete (AccountController::deleteAccount);
+						});
+						
+						path ("{fromAccountId}/transfer/{toAccountId}", () -> {
+							patch (AccountController::transferBetweenAccounts);
+						});
+					});
+				});
+			});
+		});
 		
-		webServer.post ("/clients", ClientController::createClient);
+		Logger logger = Logger.getLogger (Dispatcher.class);
 		
-		webServer.put ("/clients/{clientId}", ClientController::updateClientName);
-		
-		webServer.delete ("/clients/{clientId}", ClientController::deleteClient);
-		
-		//accounts
-		webServer.get ("/clients/{clientId}/accounts", AccountController::getAccounts);
-		webServer.get ("/clients/{clientId}/accounts/{accountId}", AccountController::getAccount);
-		
-		webServer.post ("/clients/{clientId}/accounts", AccountController::createAccount);
-		
-		webServer.put ("/clients/{clientId}/accounts/{accountId}", AccountController::updateAccountName);
-		
-		webServer.patch ("/clients/{clientId}/accounts/{accountId}", AccountController::updateAccountBalance);
-		webServer.patch ("/clients/{clientId}/accounts/{fromAccountId}/transfer/{toAccountId}", AccountController::transferBetweenAccounts);
-		
-		webServer.delete ("clients/{clientId}/accounts/{accountId}", AccountController::deleteAccount);
-	}
-	
-	public static void handleException (Exception exception, Context context) {
-		if (exception.getClass () == NumberFormatException.class) {
-			context.status (400);
-			context.contentType ("text/plain");
+		webServer.exception (Exception.class, (exception, context) -> {
+			logger.error ("Error!", exception);
 			
-			context.result ("Error! Invalid input!");
-		}
-		
-		else if (exception.getClass () == SQLException.class || exception.getClass () == PSQLException.class) {
-			context.status (500);
-			context.contentType ("text/plain");
+			if (exception.getClass () == NumberFormatException.class) {
+				context.status (400);
+				
+				context.result ("Error! Invalid input!");
+			}
 			
-			context.result ("Error! SQL error");
-		}
-		
-		else if (exception.getClass () == NotFoundException.class) {
-			context.status (404);
-			context.contentType ("text/plain");
+			else if (exception.getClass () == SQLException.class || exception.getClass () == PSQLException.class) {
+				context.status (500);
+				
+				context.result ("Error! SQL error");
+			}
 			
-			context.result (exception.getMessage ());
-		}
-		
-		else if (exception.getClass () == UnauthorizedClientException.class) {
-			context.status (401);
-			context.contentType ("text/plain");
+			else if (exception.getClass () == NotFoundException.class) {
+				context.status (404);
+				
+				context.result (exception.getMessage ());
+			}
 			
-			context.result (exception.getMessage ());
-		}
-		
-		else if (exception.getClass () == InsufficientBalanceException.class) {
-			context.status (422);
-			context.contentType ("text/plain");
+			else if (exception.getClass () == UnauthorizedClientException.class) {
+				context.status (401);
+				
+				context.result (exception.getMessage ());
+			}
 			
-			context.result (exception.getMessage ());
-		}
-		
-		else if (exception.getClass () == InvalidBodyException.class || exception.getClass () == JsonProcessingException.class || exception.getClass () == JsonParseException.class || exception.getClass () == MismatchedInputException.class || exception.getClass () == UnrecognizedPropertyException.class || exception.getClass () == InvalidFormatException.class) {
-			context.status (400);
-			context.contentType ("text/plain");
+			else if (exception.getClass () == InsufficientBalanceException.class) {
+				context.status (422);
+				
+				context.result (exception.getMessage ());
+			}
 			
-			context.result ("Error! Invalid body");
-		}
-		
-		else {
-			context.status (500);
-			context.contentType ("text/plain");
+			else if (exception.getClass () == InvalidBodyException.class || exception.getClass () == JsonProcessingException.class || exception.getClass () == JsonParseException.class || exception.getClass () == MismatchedInputException.class || exception.getClass () == UnrecognizedPropertyException.class || exception.getClass () == InvalidFormatException.class) {
+				context.status (400);
+				
+				context.result ("Error! Invalid body");
+			}
 			
-			context.result ("Error! " + exception.getClass ().toString ());
-		}
+			else {
+				context.status (500);
+				
+				context.result ("Error! " + exception.getClass ().toString ());
+			}
+		});
 	}
 }
