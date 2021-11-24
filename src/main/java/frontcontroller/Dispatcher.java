@@ -13,7 +13,6 @@ import exceptions.NotFoundException;
 import exceptions.UnauthorizedClientException;
 import io.javalin.Javalin;
 import org.apache.log4j.Logger;
-import org.postgresql.util.PSQLException;
 
 import java.sql.SQLException;
 

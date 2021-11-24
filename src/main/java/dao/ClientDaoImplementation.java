@@ -8,9 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientDaoImplementation implements ClientDao {
+	private final String url;
+	private final String username;
+	private final String password;
+	
+	public ClientDaoImplementation () {
+		this.url = DatabaseCredentials.url;
+		this.username = DatabaseCredentials.username;
+		this.password = DatabaseCredentials.password;
+	}
+	
+	public ClientDaoImplementation (String url, String username, String password) {
+		this.url = url;
+		this.username = username;
+		this.password = password;
+	}
+	
 	@Override
 	public List <Client> getClients () throws SQLException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM clients;");
 			
 			ResultSet resultSet = statement.executeQuery ();
@@ -27,7 +43,7 @@ public class ClientDaoImplementation implements ClientDao {
 	
 	@Override
 	public Client getClient (int clientId) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM clients WHERE id = ?;");
 			
 			statement.setInt (1, clientId);
@@ -50,7 +66,7 @@ public class ClientDaoImplementation implements ClientDao {
 	
 	@Override
 	public void createClient (String clientName) throws SQLException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("INSERT INTO clients (name) VALUES (?)");
 			
 			statement.setString (1, clientName);
@@ -61,7 +77,7 @@ public class ClientDaoImplementation implements ClientDao {
 	
 	@Override
 	public void updateClientName (int clientId, String clientName) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("UPDATE clients SET name = ? WHERE id = ?;");
 			
 			statement.setString (1, clientName);
@@ -77,7 +93,7 @@ public class ClientDaoImplementation implements ClientDao {
 	
 	@Override
 	public void deleteClient (int clientId) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("DELETE FROM clients WHERE id = ?;");
 			
 			statement.setInt (1, clientId);

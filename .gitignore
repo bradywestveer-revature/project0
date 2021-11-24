@@ -1,3 +1,4 @@
 .idea/
 **/target/
+h2/**
 logs.txt

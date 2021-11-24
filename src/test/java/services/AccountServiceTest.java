@@ -44,9 +44,7 @@ class AccountServiceTest {
 	void getAccountsWhenNoAccounts () throws SQLException {
 		Mockito.when (accountDao.getAccounts ()).thenReturn (new ArrayList <> ());
 		
-		assertThrows (NotFoundException.class, () -> {
-			accountService.getAccounts (1);
-		});
+		assertThrows (NotFoundException.class, () -> accountService.getAccounts (1));
 	}
 	
 	@Test
@@ -76,9 +74,7 @@ class AccountServiceTest {
 	void getAccountsInRangeWhenNoAccounts () throws SQLException {
 		Mockito.when (accountDao.getAccounts ()).thenReturn (new ArrayList <> ());
 		
-		assertThrows (NotFoundException.class, () -> {
-			accountService.getAccountsInRange (1, 0.0F, 0.0F);
-		});
+		assertThrows (NotFoundException.class, () -> accountService.getAccountsInRange (1, 0.0F, 0.0F));
 	}
 	
 	@Test
@@ -102,9 +98,7 @@ class AccountServiceTest {
 		
 		Mockito.when (accountDao.getAccount (accountId)).thenReturn (account);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.getAccount (clientId, accountId);
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.getAccount (clientId, accountId));
 	}
 	
 	@Test
@@ -137,9 +131,7 @@ class AccountServiceTest {
 		
 		Mockito.when (accountDao.getAccountClientId (accountId)).thenReturn (2);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.updateAccountName (clientId, accountId, "Client 1");
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.updateAccountName (clientId, accountId, "Client 1"));
 	}
 	
 	@Test
@@ -161,9 +153,7 @@ class AccountServiceTest {
 		
 		Mockito.when (accountDao.getAccountClientId (accountId)).thenReturn (2);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.deleteAccount (clientId, accountId);
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.deleteAccount (clientId, accountId));
 	}
 	
 	@Test
@@ -186,9 +176,7 @@ class AccountServiceTest {
 		
 		Mockito.when (accountDao.getAccountClientId (accountId)).thenReturn (2);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.depositToAccount (clientId, accountId, 0.0F);
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.depositToAccount (clientId, accountId, 0.0F));
 	}
 	
 	@Test
@@ -211,22 +199,18 @@ class AccountServiceTest {
 		
 		Mockito.when (accountDao.getAccountClientId (accountId)).thenReturn (2);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.withdrawFromAccount (clientId, accountId, 0.0F);
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.withdrawFromAccount (clientId, accountId, 0.0F));
 	}
 	
 	@Test
-	void withdrawFromAccountWhenBalanceIsInsufficient () throws SQLException, NotFoundException, UnauthorizedClientException, InsufficientBalanceException {
+	void withdrawFromAccountWhenBalanceIsInsufficient () throws SQLException, NotFoundException {
 		int clientId = 1;
 		int accountId = 1;
 		
 		Mockito.when (accountDao.getAccountClientId (accountId)).thenReturn (clientId);
 		Mockito.when (accountDao.getAccountBalance (accountId)).thenReturn (0.0F);
 		
-		assertThrows (InsufficientBalanceException.class, () -> {
-			accountService.withdrawFromAccount (clientId, accountId, 1.0F);
-		});
+		assertThrows (InsufficientBalanceException.class, () -> accountService.withdrawFromAccount (clientId, accountId, 1.0F));
 	}
 	
 	@Test
@@ -255,9 +239,7 @@ class AccountServiceTest {
 		Mockito.when (accountDao.getAccountClientId (fromAccountId)).thenReturn (2);
 		Mockito.when (accountDao.getAccountClientId (toAccountId)).thenReturn (clientId);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 0.0F);
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 0.0F));
 	}
 	
 	@Test
@@ -269,9 +251,7 @@ class AccountServiceTest {
 		Mockito.when (accountDao.getAccountClientId (fromAccountId)).thenReturn (clientId);
 		Mockito.when (accountDao.getAccountClientId (toAccountId)).thenReturn (2);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 0.0F);
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 0.0F));
 	}
 	
 	@Test
@@ -283,9 +263,7 @@ class AccountServiceTest {
 		Mockito.when (accountDao.getAccountClientId (fromAccountId)).thenReturn (2);
 		Mockito.when (accountDao.getAccountClientId (toAccountId)).thenReturn (2);
 		
-		assertThrows (UnauthorizedClientException.class, () -> {
-			accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 0.0F);
-		});
+		assertThrows (UnauthorizedClientException.class, () -> accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 0.0F));
 	}
 	
 	@Test
@@ -299,8 +277,6 @@ class AccountServiceTest {
 		
 		Mockito.when (accountDao.getAccountBalance (fromAccountId)).thenReturn (0.0F);
 		
-		assertThrows (InsufficientBalanceException.class, () -> {
-			accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 1.0F);
-		});
+		assertThrows (InsufficientBalanceException.class, () -> accountService.transferBetweenAccounts (clientId, fromAccountId, toAccountId, 1.0F));
 	}
 }

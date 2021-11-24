@@ -8,11 +8,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountDaoImplementation implements AccountDao {
-	private final ClientDao clientDao = new ClientDaoImplementation ();
+	private final ClientDao clientDao;
+	
+	private final String url;
+	private final String username;
+	private final String password;
+	
+	public AccountDaoImplementation () {
+		this.clientDao = new ClientDaoImplementation ();
+		this.url = DatabaseCredentials.url;
+		this.username = DatabaseCredentials.username;
+		this.password = DatabaseCredentials.password;
+	}
+	
+	public AccountDaoImplementation (ClientDao clientDao, String url, String username, String password) {
+		this.clientDao = clientDao;
+		this.url = url;
+		this.username = username;
+		this.password = password;
+	}
 	
 	@Override
 	public List <Account> getAccounts () throws SQLException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM accounts;");
 			
 			ResultSet resultSet = statement.executeQuery ();
@@ -29,7 +47,7 @@ public class AccountDaoImplementation implements AccountDao {
 	
 	@Override
 	public Account getAccount (int accountId) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM accounts WHERE id = ?;");
 			
 			statement.setInt (1, accountId);
@@ -52,7 +70,7 @@ public class AccountDaoImplementation implements AccountDao {
 	
 	@Override
 	public int getAccountClientId (int accountId) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM accounts WHERE id = ?;");
 			
 			statement.setInt (1, accountId);
@@ -75,7 +93,7 @@ public class AccountDaoImplementation implements AccountDao {
 	
 	@Override
 	public float getAccountBalance (int accountId) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("SELECT * FROM accounts WHERE id = ?;");
 			
 			statement.setInt (1, accountId);
@@ -101,7 +119,7 @@ public class AccountDaoImplementation implements AccountDao {
 		//throws NotFoundException if client doesn't exist
 		clientDao.getClient (clientId);
 		
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("INSERT INTO accounts (client_id_fk, name) VALUES (?, ?)");
 			
 			statement.setInt (1, clientId);
@@ -113,7 +131,7 @@ public class AccountDaoImplementation implements AccountDao {
 	
 	@Override
 	public void updateAccountName (int accountId, String accountName) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("UPDATE accounts SET name = ? WHERE id = ?;");
 			
 			statement.setString (1, accountName);
@@ -128,7 +146,7 @@ public class AccountDaoImplementation implements AccountDao {
 	
 	@Override
 	public void updateAccountBalance (int accountId, float balance) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("UPDATE accounts SET balance = ? WHERE id = ?;");
 			
 			statement.setFloat (1, balance);
@@ -143,7 +161,7 @@ public class AccountDaoImplementation implements AccountDao {
 	
 	@Override
 	public void deleteAccount (int accountId) throws SQLException, NotFoundException {
-		try (Connection connection = DriverManager.getConnection (DatabaseCredentials.url, DatabaseCredentials.username, DatabaseCredentials.password)) {
+		try (Connection connection = DriverManager.getConnection (url, username, password)) {
 			PreparedStatement statement = connection.prepareStatement ("DELETE FROM accounts WHERE id = ?;");
 			
 			statement.setInt (1, accountId);
