@@ -1,0 +1,18 @@
+change daoImplementations to use constructor for url, username, password
+dao - integration testing, add h2
+
+create utilities package
+create H2Utilities class for testing functions that use the h2 database (like create a table, drop the table)
+
+for h2:
+public static final String url = "jdbc:h2:./h2/database";
+public static final String username = "sa";
+public static final String password = "sa";v
+
+intellij inspect code
+
+controller testing
+
+somehow work around having to include "throws" for some test methods that use mockito to call the method that could throw the exception
+make controllers not static, make instances in Dispatcher and then use the instance to call the handler functions?
+fix float rounding bugs

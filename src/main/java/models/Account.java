@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Objects;
+
 public class Account {
 	private int id;
 	private int clientId;
@@ -56,5 +58,13 @@ public class Account {
 				", balance=" + balance +
 				", name='" + name + '\'' +
 				'}';
+	}
+	
+	@Override
+	public boolean equals (Object o) {
+		if (this == o) return true;
+		if (o == null || getClass () != o.getClass ()) return false;
+		Account account = (Account) o;
+		return id == account.id && clientId == account.clientId && Objects.equals (balance, account.balance) && Objects.equals (name, account.name);
 	}
 }

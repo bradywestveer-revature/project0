@@ -1,6 +1,7 @@
 package services;
 
 import dao.ClientDao;
+import dao.ClientDaoImplementation;
 import exceptions.NotFoundException;
 import models.Client;
 
@@ -9,6 +10,10 @@ import java.util.List;
 
 public class ClientService {
 	private final ClientDao clientDao;
+	
+	public ClientService () {
+		this.clientDao = new ClientDaoImplementation ();
+	}
 	
 	public ClientService (ClientDao clientDao) {
 		this.clientDao = clientDao;

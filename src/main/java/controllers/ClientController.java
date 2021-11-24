@@ -2,7 +2,6 @@ package controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.ClientDaoImplementation;
 import exceptions.InvalidBodyException;
 import exceptions.NotFoundException;
 import io.javalin.http.Context;
@@ -12,7 +11,7 @@ import services.ClientService;
 import java.sql.SQLException;
 
 public class ClientController {
-	private static final ClientService clientService = new ClientService (new ClientDaoImplementation ());
+	private static final ClientService clientService = new ClientService ();
 	
 	public static void getClients (Context context) throws SQLException, NotFoundException, JsonProcessingException {
 		context.status (200);

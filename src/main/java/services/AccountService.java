@@ -1,6 +1,7 @@
 package services;
 
 import dao.AccountDao;
+import dao.AccountDaoImplementation;
 import exceptions.InsufficientBalanceException;
 import exceptions.NotFoundException;
 import exceptions.UnauthorizedClientException;
@@ -12,6 +13,10 @@ import java.util.List;
 
 public class AccountService {
 	private final AccountDao accountDao;
+	
+	public AccountService () {
+		this.accountDao = new AccountDaoImplementation ();
+	}
 	
 	public AccountService (AccountDao accountDao) {
 		this.accountDao = accountDao;
@@ -114,12 +119,12 @@ public class AccountService {
 	}
 	
 	public void transferBetweenAccounts (int clientId, int fromAccountId, int toAccountId, float amount) throws SQLException, NotFoundException, UnauthorizedClientException, InsufficientBalanceException {
-		//if account is owned by clientId
+		//if fromAccount is not owned by clientId
 		if (accountDao.getAccountClientId (fromAccountId) != clientId) {
 			throw new UnauthorizedClientException ("Error! Account with account id: " + fromAccountId + " is not owned by a client with client id: " + clientId);
 		}
 		
-		//if account is owned by clientId
+		//if toAccount is not owned by clientId
 		if (accountDao.getAccountClientId (toAccountId) != clientId) {
 			throw new UnauthorizedClientException ("Error! Account with account id: " + toAccountId + " is not owned by a client with client id: " + clientId);
 		}

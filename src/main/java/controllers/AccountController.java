@@ -4,7 +4,6 @@ import bodymodels.Transaction;
 import bodymodels.Transfer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dao.AccountDaoImplementation;
 import exceptions.InsufficientBalanceException;
 import exceptions.InvalidBodyException;
 import exceptions.NotFoundException;
@@ -17,7 +16,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 
 public class AccountController {
-	private static final AccountService accountService = new AccountService (new AccountDaoImplementation ());
+	private static final AccountService accountService = new AccountService ();
 	
 	public static void getAccounts (Context context) throws SQLException, NotFoundException, JsonProcessingException {
 		String minimumBalance = context.queryParam ("amountGreaterThan");

@@ -61,7 +61,7 @@ public class Dispatcher {
 				context.result ("Error! Invalid input!");
 			}
 			
-			else if (exception.getClass () == SQLException.class || exception.getClass () == PSQLException.class) {
+			else if (exception.getClass () == SQLException.class) {
 				context.status (500);
 				
 				context.result ("Error! SQL error");
