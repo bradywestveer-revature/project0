@@ -66,6 +66,6 @@ public class ClientController {
 		
 		context.status (205);
 		
-		context.result ("Deleted client with client id: " + clientId);
+		context.result ("Deleted client with client id: " + clientId + " and all of their accounts");
 	}
 }

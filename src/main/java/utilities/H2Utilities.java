@@ -26,7 +26,7 @@ public class H2Utilities {
 	}
 	
 	public static void createAccountsTable () {
-		executeStatement ("CREATE TABLE accounts (id serial PRIMARY KEY, client_id_fk int NOT NULL REFERENCES clients (id), balance float NOT NULL DEFAULT 0.0, name varchar (100) NOT NULL);");
+		executeStatement ("CREATE TABLE accounts (id serial PRIMARY KEY, client_id_fk int NOT NULL REFERENCES clients (id) ON DELETE CASCADE, balance float NOT NULL DEFAULT 0.0, name varchar (100) NOT NULL);");
 	}
 	
 	public static void dropAccountsTable () {
